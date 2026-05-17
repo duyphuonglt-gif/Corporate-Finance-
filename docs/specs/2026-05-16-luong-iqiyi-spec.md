@@ -154,6 +154,7 @@ All values in RMB thousands unless column specifies USD. Source: iQIYI Form 20-F
 | `shares_outstanding` | Shares outstanding (diluted, ADS basis) | 962,959 | '000 ADS |
 | `cost_capital` | WACC (analyst assumption) | 0.09 | decimal |
 | `tax_rate` | Statutory tax rate (PRC) | 0.25 | decimal |
+| `fx_rate` | RMB/USD exchange rate (Federal Reserve H.10, Dec 31, 2025) | 6.9931 | RMB per USD |
 
 ---
 
@@ -186,6 +187,7 @@ All formulas expressed in named-range notation. Executor must verify computed va
 | Named Range | Formula | Computed Value | Unit |
 |-------------|---------|----------------|------|
 | `market_capitalization` | `share_price × shares_outstanding` | 1,136,292 | USD '000 |
+| `market_capitalization_rmb` | `market_capitalization × fx_rate` | 7,946,204 | RMB '000 |
 | `startYear_equity` | `BAL_equity_shareholders_prior` | 13,373,764 | RMB '000 |
 | `startYear_inventory` | `BAL_inventories_prior` | 388,718 | RMB '000 |
 | `startYear_receivables` | `BAL_receivables_prior` | 2,191,178 | RMB '000 |
@@ -217,11 +219,11 @@ All ratios computed on Ratios tab. Values from Stage 3 populated workbook (FY202
 
 | Ratio | Formula (named-range notation) | Value | Unit |
 |-------|-------------------------------|-------|------|
-| Market Value Added (MVA) | `market_capitalization − currentYear_equity` | –12,172,634 | '000 |
-| Market-to-Book | `market_capitalization / currentYear_equity` | 0.085x | x |
+| Market Value Added (MVA) | `market_capitalization_rmb − currentYear_equity` | –5,362,722 | RMB '000 |
+| Market-to-Book | `market_capitalization_rmb / currentYear_equity` | 0.597x | x |
 | Economic Value Added (EVA) | `currentYear_after_tax_operating_income − (cost_capital × startYear_total_capitalization)` | –1,570,336 | RMB '000 |
 
-> **Unit note for Performance ratios:** `market_capitalization` is in USD '000; `currentYear_equity` is in RMB '000. Both are used directly in the formula per the Stage 1 template convention — no FX conversion is applied. MVA and Market-to-Book are computed on a mixed-unit basis consistent with the template.
+> **Unit note for Performance ratios:** `market_capitalization` is in USD '000 and must be converted to RMB '000 before use: `market_capitalization_rmb = market_capitalization × fx_rate` = 1,136,292 × 6.9931 = **7,946,204 RMB '000**. All Performance ratio formulas use `market_capitalization_rmb` — never the raw USD figure — so that MVA and Market-to-Book are computed in a single currency (RMB '000), consistent with all other named ranges in this model.
 
 #### Profitability
 
@@ -303,7 +305,7 @@ The executor must address the following for each ratio category, using **FY2025 
 > **FY2024 IS scope note:** The Income Statement and Cash Flow Statement tabs contain FY2025 data only. FY2024 income statement absolute figures (net income, revenue, COGS, etc.) are **not** in the named-range model and must not be derived or cited. When referencing FY2024 profitability context, use only the margin percentages stated in §1 (net margin +2.7%, gross margin 24.9%). Do not back-calculate FY2024 absolute net income or revenue from these percentages.
 
 **Performance (MVA, Market-to-Book, EVA):**
-- Explain why MVA is deeply negative (market cap $1.1B USD vs. book equity RMB 13.3B ≈ $1.9B USD). Is this a valuation discount, a capital destruction signal, or both?
+- Explain why MVA is deeply negative (`market_capitalization_rmb` = RMB 7,946.2M vs. `currentYear_equity` = RMB 13,308.9M, giving MVA = –RMB 5,362.7M). Is this a valuation discount, a capital destruction signal, or both?
 - EVA = –RMB 1.57B: quantify how much of this shortfall comes from insufficient operating income vs. high cost of capital applied to the capital base.
 - Connect Market-to-Book < 1 to the retained-earnings deficit (–RMB 42.7B) and assess whether accumulated losses are the primary explanation.
 
