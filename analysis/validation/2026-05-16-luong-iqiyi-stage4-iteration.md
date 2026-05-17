@@ -1,17 +1,13 @@
 ---
 template: iteration-log
-purpose: "Annotated before/after diff documenting spec changes made during HIL review — supports Stage 4 rubric criterion: Spec craft + prompt log quality"
-author: "Luong Duy Phuong"
-date: "2026-05-16"
+purpose: "Annotated HIL iteration log — before/after spec diffs, round-by-round narrative, and cross-vendor findings — supporting Stage 4 rubric criterion: Spec craft + prompt log quality"
+audience: student
+fields_required: [gap_diffs, gap_status_summary, iteration_narrative, round_summaries, cross_vendor_findings]
+naming_convention: "YYYY-MM-DD-{lastname}-{company-slug}-stage4-iteration.md"
 course: BUS-629
 stage: 4
 company: "iQIYI Inc (IQ, NASDAQ)"
-spec_file: "docs/specs/2026-05-16-luong-iqiyi-spec.md"
-spec_version: "2.0"
-rounds: 5
-tests: 6
-gaps_total: 10
-gaps_closed: 10
+notes: "Covers 5 rounds of HIL revision and 6 independent reconstruction tests (Claude Tests 1–4, Gemini Tests 5–6). Spec file: docs/specs/2026-05-16-luong-iqiyi-spec.md (v2.0). Total gaps identified: 10; all 10 closed. Most critical: GAP B (Market-to-Book FX conversion — market_capitalization_rmb = 7,946,204 RMB '000; Market-to-Book = 0.597x; MVA = –5,362,722 RMB '000) and GAP 2 (Du Pont vs. direct ROE time-mismatch — currentYear_equity vs. startYear_equity, 3 bp methodological artifact)."
 ---
 
 # Stage 4 HIL Iteration Log — iQIYI Inc (IQ)
