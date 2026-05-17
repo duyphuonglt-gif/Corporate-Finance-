@@ -6,7 +6,7 @@ fields_required: [title, author, date, version, company, scope, model_architectu
 naming_convention: "YYYY-MM-DD-{lastname}-{company-slug}-spec.md"
 course: BUS-629
 stage: 4
-notes: "Authored for BUS-629 Stage 4 — iQIYI Inc. (IQ, NASDAQ) FY2025 ratio analysis. Spec v2.0 incorporates 5 rounds of HIL iteration and cross-vendor testing (Claude + Gemini); all 10 identified gaps closed. D&A treatment note: INC_depreciation = 0 (iQIYI embeds D&A in COGS); Cash Coverage uses CASH_depreciation_amortization from CF Statement. Market-to-Book and MVA use mixed-unit '000 inputs per Stage 1 template convention — no FX conversion applied."
+notes: "Authored for BUS-629 Stage 4 — iQIYI Inc. (IQ, NASDAQ) FY2025 ratio analysis. Spec v2.0 incorporates 5 rounds of HIL iteration and cross-vendor testing (Claude + Gemini); all 10 identified gaps closed. D&A treatment: INC_depreciation = 0 (iQIYI embeds D&A in COGS); Cash Coverage uses CASH_depreciation_amortization = 13,264,120 RMB '000 from CF Statement. FX conversion: market_capitalization (USD '000) is converted to RMB via market_capitalization_rmb = market_capitalization × fx_rate (6.9931) = 7,946,204 RMB '000 before computing Market-to-Book (0.597x) and MVA (–5,362,722 RMB '000)."
 ---
 
 # iQIYI Inc — Accounting & Performance Ratios: Technical Specification
