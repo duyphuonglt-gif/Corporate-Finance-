@@ -312,7 +312,7 @@ The executor must address the following for each ratio category, using **FY2025 
 **Profitability (ROA, ROC, ROE + margins):**
 - Decompose the gap between operating profit margin (1.75%) and net profit margin (–0.75%). Identify interest expense (RMB 909.6M) as the bridge, and explain why operating income (EBIT = RMB 229.3M) is insufficient to cover it.
 - Explain why ROA (1.04%) is positive while ROE (–1.53%) is negative — this is the leverage/interest burden story.
-- Trend context: gross margin compressed from **24.9% (FY2024) → 21.1% (FY2025)** — a 380-basis-point year-over-year deterioration. All figures derivable from Stage 3 workbook: `(INC_sales − INC_cost_goods_sold) / INC_sales` for FY2025; `(BAL_assets_total_prior − BAL_liabilities_total_prior − ... )` — see Gross Margin definition in §6. Executor must not reference FY2023 data; it is not in the Stage 3 model and cannot be verified from spec inputs.
+- Trend context: gross margin compressed from **24.9% (FY2024) → 21.1% (FY2025)** — a 380-basis-point year-over-year deterioration. FY2023 is outside the model; do not reference it.
 
 **Efficiency (turnover ratios):**
 - Asset turnover (0.596x) declining trend signals that assets are not being converted to revenue efficiently as revenue falls. Connect to the fixed-cost nature of the content library.
@@ -322,7 +322,7 @@ The executor must address the following for each ratio category, using **FY2025 
 **Leverage (debt ratios, TIE, coverage):**
 - TIE = 0.25x is the critical red flag. EBIT covers only 25% of interest expense. Explain the solvency implication and connect to net loss.
 - Cash Coverage = 14.83x (using D&A add-back). Contrast with TIE. Explain why the divergence is so large for a content platform (high non-cash D&A on content assets).
-- Total Debt Ratio = 71.5%: contextualize against iQIYI's convertible note structure (PAG Notes $550M at 6%, 2028 Notes $208M at 6.5%).
+- Total Debt Ratio = 71.5%: contextualize against iQIYI's USD-denominated convertible note structure.
 
 **Liquidity:**
 - Current Ratio = 0.47x and NWC = –RMB 11.8B are severe. Explain why a streaming company can operate with negative working capital (deferred revenue, content payables cycle).
@@ -386,7 +386,7 @@ Produce **3–5 management-directed recommendations**. Each recommendation must:
 
 **Citation style:** Cite named ranges inline when referencing a specific figure (e.g., "`INC_ebit` = RMB 229,315K"). Cite the 20-F for any claim about business context.
 
-**Unit translation rule:** All named-range values in this spec are in **RMB thousands (RMB '000)**. When presenting values in prose, convert to millions for readability: divide by 1,000 and append "M" (e.g., `INC_interest_expense` = 909,616 → **RMB 909.6M**; `currentYear_after_tax_operating_income` = 478,169 → **RMB 478.2M**). Do not write "RMB 478K" — that implies RMB 478,000, which is three orders of magnitude too small. Exception: small values below RMB 10M may be written as "RMB X,XXX K".
+**Unit translation rule:** All named-range values in this spec are in **RMB thousands (RMB '000)**. When presenting values in prose, convert to millions: divide by 1,000 and append "M" (e.g., `INC_interest_expense` = 909,616 → **RMB 909.6M**). Do not write "RMB 478K" — that is three orders of magnitude too small.
 
 ---
 

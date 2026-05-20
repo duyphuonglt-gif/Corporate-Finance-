@@ -40,11 +40,13 @@ FY2025 results represent a material deterioration relative to FY2024:
 
 | Metric | FY2024 | FY2025 | Change |
 |--------|--------|--------|--------|
-| Revenue | — | RMB 27,291.3M | –6.6% YoY |
+| Revenue | RMB 29,225.2M | RMB 27,291.3M | –6.6% |
 | Gross Margin | 24.9% | 21.1% | –380 bps |
 | Net Margin | +2.7% | –0.75% | Sign reversal |
-| Net Income | positive | –RMB 204.0M | Loss |
-| Market Cap (USD) | — | ~$1.14B | –40.7% YTD |
+| Net Income | +RMB 790.6M | –RMB 204.0M | –126% |
+| Market Cap (USD) | $1.94B | $1.14B | –41.5% |
+
+> **Sources — FY2024 figures:** Revenue RMB 29,225.2M (29,225,238 RMB '000) sourced directly from iQIYI Form 20-F FY2025 consolidated income statement. Market Cap $1.94B = 962,842K ADS (20-F) × $2.02/ADS (iQIYI IR, Dec 31, 2024). Net Income FY2024 = RMB 790.6M (790,589 RMB '000) sourced directly from iQIYI Form 20-F FY2025 consolidated income statement. The Stage 2 memo cited –40.7% YTD as of May 14, 2026; the precise Dec 31, 2024 → Dec 31, 2025 fiscal-year decline is –41.5% using 20-F and IR source data.
 
 The sign reversal in net margin — from +2.7% to –0.75% — in a single fiscal year is the primary analytical event of FY2025. The direct cause is not operating deterioration alone but the interaction of thin operating margin (1.75%) with a fixed interest burden (RMB 909.6M) that exceeds EBIT (RMB 229.3M), producing TIE of 0.25x and a net loss.
 
@@ -200,4 +202,90 @@ The LLM identified five strategically sound recommendations. The assessment belo
 
 ---
 
-*Sections 5 (LLM Evaluation & Annotations) and 6 (Executive Justification) will be added following completion of the spec retrospective (`deliverables/2026-05-18-luong-iqiyi-spec-retrospective.md`).*
+## 5. LLM Evaluation & Annotations
+
+This section evaluates the raw LLM output — `deliverables/2026-05-18-luong-iqiyi-llm-raw.md` (Claude claude-sonnet-4-6), referred to throughout as "the raw LLM output" — against the Stage 4 spec v2.0. Where relevant, earlier test outputs are cited as evidence: an earlier Claude test against a prior spec version ("the earlier Claude test"), and two Gemini tests against spec v2.0 ("Gemini Test 5" and "Gemini Test 6"). These comparisons distinguish errors caused by spec gaps from errors caused by LLM-specific behavior. Full iteration history: `analysis/validation/2026-05-16-luong-iqiyi-stage4-iteration.md`.
+
+### 5.1 What the Raw LLM Output Executed Correctly
+
+`2026-05-18-luong-iqiyi-llm-raw.md` is the first test output to pass all 10 identified spec gaps cleanly. The following table summarises confirmed correct execution:
+
+| Gap | Description | Execution | Verification |
+|-----|-------------|-----------|--------------|
+| GAP 1 | Cash Coverage: D&A sourced from CF Statement (`CASH_depreciation_amortization`), not IS (`INC_depreciation = 0`) | ✅ Explicitly named `CASH_depreciation_amortization` = RMB 13,264.1M and explained the embedded D&A accounting structure | Manual: (229,315 + 13,264,120) / 909,616 = 14.83x ✓ |
+| GAP 2 | Du Pont vs. direct ROE: `currentYear_equity` (FY2025) vs. `startYear_equity` (FY2024), 3 bp artifact | ✅ Exact language: "methodological artifact, not a computation error" | Manual: Du Pont –1.56%, direct –1.53%, difference = 3 bp ✓ |
+| GAP 3 | No FY2023 data in any ratio or narrative | ✅ Zero FY2023 references in 475-line output | — |
+| GAP 4 / VIE | Recommendation covers USD debt vs. RMB cash flows, HNTE license risk, three formal WACC reassessment triggers | ✅ Rec 5 cites `fx_rate` 6.9931, VIE structure, HNTE renewal, three specific triggers | — |
+| GAP 5 | FY2024 cited by percentage only — no derived absolute IS values | ✅ Only "+2.7%" and "24.9%" used for FY2024; no RMB absolute derived | — |
+| GAP A | Gross Margin 21.1% present in appendix ratio table | ✅ Appendix row present; cited 4× in prose | — |
+| GAP B | FX conversion: `market_capitalization_rmb = market_cap_usd × fx_rate`; Market-to-Book = 0.597x; MVA = –5,362,722 | ✅ All performance formulas use `market_cap_rmb`; unit note explicit | Manual: 0.598x (0.001x workbook rounding gap — not LLM error) |
+| GAP C | All prose values in RMB M; appendix in RMB '000 with header note | ✅ Consistent throughout | — |
+| GAP D | No back-calculation of FY2024 absolute IS line items | ✅ No FY2024 COGS, EBIT, or net income in absolute terms | — |
+| GAP F | Full English — no Vietnamese words | ✅ Entire 475-line output in English | — |
+
+ROA and EVA were additionally confirmed by manual recomputation: ROA = 478,169 / 45,760,525 = 1.04% ✓; EVA = 478,169 − (0.09 × 22,761,169) = –1,570,336 RMB '000 ✓.
+
+### 5.2 Three Most Consequential Spec Gaps — Evidence from Cross-Version Testing
+
+`2026-05-18-luong-iqiyi-llm-raw.md` was not the first test. The spec required five rounds of HIL revision and six independent tests before reaching a clean pass. Three gaps produced the most analytically significant failures and are documented in detail below, because they reveal what the spec was not yet saying precisely enough — and in one case, what a specific LLM family does when a spec contradicts itself.
+
+**GAP B — FX Conversion: Market-to-Book computed across two currencies (most critical)**
+
+In the earlier Claude test against the prior spec version, the spec did not include `fx_rate` as a named range or `market_capitalization_rmb` as a derived input. The executor divided `market_capitalization` (USD '000) directly by `currentYear_equity` (RMB '000), producing Market-to-Book = **0.085x** — a dimensionless ratio computed across two different currencies with no financial meaning. MVA was correspondingly wrong. This was a spec gap, not an LLM error: the spec gave no instruction to convert units, so the LLM applied the formula as written.
+
+Fix applied in spec v2.0 (Round 2): added `fx_rate = 6.9931` to §3 Analyst Assumptions; added `market_capitalization_rmb = market_capitalization × fx_rate = 1,136,292 × 6.9931 = 7,946,204 RMB '000` to §5 Derived Inputs; rewrote all §6 Performance formulas to use `market_capitalization_rmb`. The correct values — Market-to-Book = 0.597x, MVA = –5,362,722 RMB '000 — first appeared in `2026-05-18-luong-iqiyi-llm-raw.md` and were manually confirmed at 0.598x (workbook rounding, see Section 5.4).
+
+**GAP 2 — Du Pont Mismatch: Internal spec contradiction resolved differently across LLM families**
+
+After Round 2 corrected §7 (validation table) to describe the Du Pont vs. direct ROE difference as a `currentYear_equity` vs. `startYear_equity` time-mismatch, §9 (executor instruction) was not simultaneously updated and still contained the original wrong explanation referencing assets. The spec had an internal contradiction: §7 and §9 described the same gap differently.
+
+Claude (earlier tests) resolved this by deferring to §7 — the validation table, which it treated as authoritative. Gemini Test 5, presented with the same contradictory spec, deferred to §9 — the executor instruction section, which it treated as more action-oriented — and reproduced the original wrong explanation verbatim. Neither resolution was illogical given the ambiguity. They reflect different contradiction-resolution heuristics between model families: the same underspecified spec produced different wrong answers depending on which LLM executed it. The contradiction itself was the spec gap.
+
+Fix applied in spec v2.0 (Round 5): §9 was fully rewritten to mirror §7 exactly — "RATIO_leverage uses `currentYear_equity` (FY2025 year-end) as its denominator, while direct ROE uses `startYear_equity` (FY2024 year-end). Both are internally consistent; the 3-basis-point difference is a methodological artifact, not a computation error." Both `2026-05-18-luong-iqiyi-llm-raw.md` and Gemini Test 6 passed GAP 2 after this fix.
+
+**GAP 1 — Cash Coverage D&A Source: Wrong input when spec did not specify the named range**
+
+iQIYI embeds all depreciation and amortization in `INC_cost_goods_sold` — there is no separate D&A line on the Income Statement (`INC_depreciation = 0`). An executor reading the Cash Coverage formula without an explicit source instruction would naturally look for D&A on the Income Statement, find zero, and either use zero (collapsing Cash Coverage to equal TIE at 0.25x) or attempt to derive D&A from COGS — neither of which is correct.
+
+The correct source is `CASH_depreciation_amortization = RMB 13,264,120` from the operating section of the Cash Flow Statement. This is a model-specific named range not present in the Stage 1 template. Without naming it explicitly and declaring its source, the spec left the executor without a valid input for Cash Coverage.
+
+Fix applied in spec v2.0 (Round 4): `CASH_depreciation_amortization` was added as a declared named range in §4, with an explicit note that `INC_depreciation = 0` on the IS and that Cash Coverage must use the CF Statement figure. `2026-05-18-luong-iqiyi-llm-raw.md` correctly named `CASH_depreciation_amortization = RMB 13,264.1M`, sourced it from "the operating section of the Cash Flow Statement," and produced Cash Coverage = 14.83x. Manual verification confirms: (229,315 + 13,264,120) / 909,616 = 14.83x ✓.
+
+### 5.3 Spec Gaps vs. LLM Limitations — Classification
+
+| Gap | Error | Observed in | Root cause | Fixable by spec? |
+|-----|-------|-------------|------------|-----------------|
+| GAP B | Market-to-Book = 0.085x (USD ÷ RMB, no FX conversion) | Earlier Claude test | Spec omitted `fx_rate` and `market_capitalization_rmb` | ✅ Yes — fixed Round 2 |
+| GAP 2 | Du Pont mismatch explanation wrong | Earlier Claude test, Gemini Test 5 | §7 and §9 contradicted each other; each model resolved differently | ✅ Yes — fixed Round 5 |
+| GAP 1 | Cash Coverage used wrong D&A source | Risk in earlier tests | Spec did not declare `CASH_depreciation_amortization` or note `INC_depreciation = 0` | ✅ Yes — fixed Round 4 |
+| GAP C | Unit error ("RMB 478K" vs "RMB 478M") | Earlier Claude test | No unit translation rule in §11 | ✅ Yes — fixed Round 2 |
+| GAP 2 re-trigger | Gemini deferred to §9 over §7 | Gemini Test 5 | Different contradiction-resolution heuristics across model families | ⚠️ Partially — removing the contradiction eliminates the risk; cannot control model-level resolution order |
+| GAP 3 | FY2023 hallucinated values when spec referenced a year outside the named-range model | Risk in earlier spec draft | Spec referenced FY2023 trend analysis; no FY2023 named ranges existed in the model — LLM filled the gap by fabricating plausible-looking figures | ✅ Yes — architectural fix: FY2023 removed entirely from spec scope (Round 3) |
+
+**The FY2023 hallucination risk — an architectural decision, not a line-item fix.** The original spec draft included a three-year trend analysis referencing FY2023 performance alongside FY2024 and FY2025. The Stage 3 named-range model, however, contained no FY2023 data — no `BAL_*_fy23`, no `INC_*_fy23`, no `CASH_*_fy23` ranges. When the spec asked executors to reference FY2023, the LLM had two options: refuse (unlikely, given that it was instructed to produce a full analysis) or generate plausible FY2023 figures from general knowledge of iQIYI's financial history. The second path is hallucination — values that look credible and are roughly in the right magnitude but are not sourced from the 20-F or the model.
+
+This is the one failure mode in this project where the risk was not a precision gap in the spec language but a **structural mismatch between what the spec asked for and what the model contained**. No amount of rewording §9 or adding unit rules to §11 would have fixed it — the only correct solution was to remove FY2023 from scope entirely. The spec was revised in Round 3 to restrict the analysis to FY2025 standalone with FY2024 as the sole prior-year benchmark, using only percentage metrics for FY2024 IS comparisons (GAP 5) to avoid any back-calculation of figures outside the named-range model.
+
+This architectural decision also clarifies the boundary condition of named-range specification as a hallucination-prevention tool: **the technique constrains the LLM's numerical degrees of freedom only for data that exists within the model**. Any reference to out-of-model data — a year not in the workbook, a metric not in the named ranges, a figure from a different filing period — creates an open hallucination window. The fix is not better prompting; it is removing the reference from scope. All numerical errors in the remaining test outputs traced to formula inputs the spec provided incorrectly or ambiguously — not to fabricated values — precisely because no out-of-model data references survived into spec v2.0.
+
+### 5.4 Residual Gaps Not Caused by Spec or LLM
+
+**Market-to-Book: 0.598x (manual) vs. 0.597x (raw LLM output).** This 0.001x gap traces to `shares_outstanding` in the Stage 3 workbook (964,912K) being 1,868K higher than the figure implied by the spec's stated `market_capitalization` (1,136,292 USD '000). The Stage 2 memo recorded 962,959K; the workbook was updated to 964,912K during Stage 3 data entry. Neither the spec nor the LLM caused this gap — it is a data source discrepancy between project stages, documented in the verification table (`analysis/validation/2026-05-18-luong-iqiyi-stage5-verification.md`).
+
+**Analytical depth in recommendations.** The five recommendations in `2026-05-18-luong-iqiyi-llm-raw.md` are directionally correct and ratio-anchored, but three areas of nuance absent from the LLM output were added in Section 4 of this analysis: (1) the refinancing paradox — at TIE = 0.25x, credit quality is impaired and accessing lower-rate debt requires credit enhancement the LLM did not address; (2) the distinction between ad-supported and subscription content when targeting gross margin recovery; and (3) the HNTE tax rate expiration risk (2026–2028) and its compounding effect on NOPAT and EVA. These are not spec gaps — the spec did not require this level of recommendation specificity. They represent the boundary between what a well-specified LLM can produce and what an analyst with domain judgment adds.
+
+---
+
+## 6. Executive Justification
+
+**Verdict: Do not invest. iQIYI is a high-risk platform whose survival depends on a content quality bet it has not yet proven it can win.**
+
+The ratio analysis in isolation leaves no room for ambiguity: every operational metric points in the wrong direction simultaneously. Gross margin compressed 380 bps in a single year, operating margin sits at a structurally vulnerable 1.75%, ROE is negative, Market-to-Book is 0.597x, and MVA is –RMB 5.4B. A company with genuine competitive strength would show operational metrics that prove its market position — not metrics that require a parent company's balance sheet to survive.
+
+The most urgent signal is TIE at 0.25x. This ratio is not a valuation concern or a cyclical setback — it is a structural solvency warning. iQIYI's EBIT of RMB 229.3M covers only one quarter of its interest obligation of RMB 909.6M. The gap cannot be bridged by operational improvement alone in the near term; it requires either a dramatic revenue recovery, a material debt reduction, or both. Without intervention, the interest burden will continue to erode the thin equity cushion (RMB 13.3B against an accumulated deficit of –RMB 42.7B), compressing the firm's ability to refinance as creditors price in rising default probability.
+
+There is one signal that prevents an outright bankruptcy call in the immediate term: the gap between TIE (0.25x) and Cash Coverage (14.83x). CASH_depreciation_amortization of RMB 13.3B — embedded in COGS and invisible on the income statement — reveals that the majority of iQIYI's cost structure is non-cash content amortization. This level of D&A does not arise organically; it reflects sustained, large-scale capital injection into content assets by Baidu, iQIYI's controlling shareholder. Baidu is funding the content library that keeps subscribers on the platform, absorbing the amortization cost through iQIYI's income statement. This is not a sign of financial health — it is a sign of dependency. The risk is deferred, not resolved.
+
+The fundamental question for iQIYI's survival is whether its content is compelling enough to acquire and retain users at a scale that generates sufficient subscription and advertising revenue to eventually service its debt independently of Baidu's support. If the content library fails to differentiate iQIYI from Tencent Video and Youku on quality, or fails to sustain ARPU in a contracting advertising market, the deferral ends and the risk crystallizes into insolvency. The current ratio of 0.47x and cash balance of RMB 4.35B — essentially matched by short-term debt maturities of RMB 4.69B — leave zero buffer for that scenario.
+
+A company with sufficient capability demonstrates it through operational metrics: growing revenue, expanding margins, and positive free cash flow that services debt without parental subsidy. iQIYI shows none of these. The Baidu backstop buys time; it does not buy a business model. Until iQIYI demonstrates that its content generates user loyalty translating into revenue recovery — and that revenue recovery translates into EBIT above RMB 909.6M — the investment case does not exist.
