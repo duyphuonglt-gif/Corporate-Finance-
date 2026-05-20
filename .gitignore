@@ -1,2 +1,22 @@
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor temp files
 *~
+*.swp
+*.swo
+
+# Excel temp/lock files
+~$*.xlsx
+~$*.xls
+*.tmp
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Claude local settings
+.claude/
